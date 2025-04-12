@@ -1,137 +1,154 @@
 #!/usr/bin/env node
 
 /**
- * 这是一个实现简单笔记系统的MCP服务器模板。
+ * 这是一个Pixabay API的MCP服务器实现
  * 它通过以下功能演示了MCP的核心概念，如资源和工具：
- * - 将笔记列为资源
- * - 读取单个笔记
- * - 通过工具创建新笔记
- * - 通过提示(prompt)汇总所有笔记
+ * - 搜索Pixabay图片
+ * - 获取Pixabay视频
  */
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-/**
- * 笔记对象的类型别名
- */
-type Note = { title: string, content: string };
+
+const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY;
 
 /**
- * 笔记的简单内存存储。
- * 在实际实现中，这可能会由数据库支持。
- */
-const notes: { [id: string]: Note } = {
-  "1": { title: "第一条笔记", content: "这是第一条笔记" },
-  "2": { title: "第二条笔记", content: "这是第二条笔记" }
-};
-
-/**
- * 创建MCP服务器，具有资源（用于列出/读取笔记）、
- * 工具（用于创建新笔记）和提示（用于汇总笔记）的功能。
+ * 创建MCP服务器，具有资源和工具
  */
 const server = new McpServer({
-  name: "",
-  version: "0.1.0",
+  name: "pixabay-mcp-server",
+  version: "0.1.0"
 });
 
 /**
- * 注册笔记资源
- * 使用ResourceTemplate来定义资源URI模式和列出/读取笔记
- */
-server.resource(
-  "notes",
-  new ResourceTemplate("note:///{id}", {
-    // 列出所有笔记资源
-    list: async () => ({
-      resources: Object.entries(notes).map(([id, note]) => ({
-        uri: `note:///${id}`,
-        mimeType: "text/plain",
-        name: note.title,
-        description: `A text note: ${note.title}`
-      })),
-    }),
-  }),
-  // 读取指定笔记内容
-  async (uri, params) => {
-    const id = params.id as string;
-    const note = notes[id];
-    if (!note) {
-      throw new Error(`笔记 ${id} 未找到`);
-    }
-
-    return {
-      contents: [{
-        uri: uri.href,
-        mimeType: "text/plain",
-        text: note.content
-      }]
-    };
-  }
-);
-
-/**
- * 注册创建笔记工具
- * 使用zod进行参数验证
+ * 注册搜索Pixabay图片工具
  */
 server.tool(
-  "create_note",
+  "search_images",
   {
-    title: z.string().describe("Title of the note"),
-    content: z.string().describe("Text content of the note"),
+    query: z.string().describe("搜索图片的关键词"),
+    image_type: z.enum(["all", "photo", "illustration", "vector"]).optional().describe("图片类型"),
+    orientation: z.enum(["all", "horizontal", "vertical"]).optional().describe("图片方向"),
+    category: z.string().optional().describe("图片类别"),
+    colors: z.string().optional().describe("图片颜色"),
+    page: z.number().optional().describe("页码"),
+    per_page: z.number().min(3).max(200).optional().describe("每页结果数量"),
+    safesearch: z.boolean().optional().describe("安全搜索"),
   },
-  async ({ title, content }) => {
-    const id = String(Object.keys(notes).length + 1);
-    notes[id] = { title, content };
+  async ({ query, image_type, orientation, category, colors, page, per_page, safesearch }) => {
+    
+    
 
-    return {
-      content: [{
-        type: "text",
-        text: `已创建笔记 ${id}: ${title}`
-      }]
-    };
+    if (!PIXABAY_API_KEY) {
+      return {
+        content: [{
+          type: "text",
+          text: "错误：未提供Pixabay API密钥。请使用环境变量PIXABAY_API_KEY提供API密钥。"
+        }]
+      };
+    }
+
+    // 构建查询参数
+    const params = new URLSearchParams();
+    params.append("key", PIXABAY_API_KEY);
+    params.append("q", query);
+    
+    if (image_type) params.append("image_type", image_type);
+    if (orientation) params.append("orientation", orientation);
+    if (category) params.append("category", category);
+    if (colors) params.append("colors", colors);
+    if (page) params.append("page", page.toString());
+    if (per_page) params.append("per_page", per_page.toString());
+    if (safesearch !== undefined) params.append("safesearch", safesearch ? "true" : "false");
+
+    try {
+      // 调用Pixabay API
+      const response = await fetch(`https://pixabay.com/api/?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify(data?.hits, null, 2)
+        }]
+      };
+    } catch (error) {
+      console.error("搜索图片时出错:", error);
+      return {
+        content: [{
+          type: "text",
+          text: `搜索图片时出错: ${error instanceof Error ? error.message : String(error)}`
+        }]
+      };
+    }
   }
 );
 
 /**
- * 注册笔记摘要提示
+ * 注册搜索Pixabay视频工具
  */
-server.prompt(
-  "summarize_notes",
-  {},
-  async () => {
-    const noteResources = Object.entries(notes).map(([id, note]) => ({
-      role: "user" as const,
-      content: {
-        type: "resource" as const,
-        resource: {
-          uri: `note:///${id}`,
-          mimeType: "text/plain",
-          text: note.content
-        }
-      }
-    }));
+server.tool(
+  "search_videos",
+  {
+    query: z.string().describe("搜索视频的关键词"),
+    video_type: z.enum(["all", "film", "animation"]).optional().describe("视频类型"),
+    category: z.string().optional().describe("视频类别"),
+    page: z.number().optional().describe("页码"),
+    per_page: z.number().min(3).max(200).optional().describe("每页结果数量"),
+    safesearch: z.boolean().optional().describe("安全搜索"),
+  },
+  async ({ query, video_type, category, page, per_page, safesearch }) => {
+    
 
-    return {
-      messages: [
-        {
-          role: "user",
-          content: {
-            type: "text",
-            text: "请汇总以下笔记："
-          }
-        },
-        ...noteResources,
-        {
-          role: "user",
-          content: {
-            type: "text",
-            text: "请提供以上所有笔记的简明摘要。"
-          }
-        }
-      ]
-    };
+    
+    if (!PIXABAY_API_KEY) {
+      return {
+        content: [{
+          type: "text",
+          text: "错误：未提供Pixabay API密钥。请使用环境变量PIXABAY_API_KEY提供API密钥。"
+        }]
+      };
+    }
+
+    // 构建查询参数
+    const params = new URLSearchParams();
+    params.append("key", PIXABAY_API_KEY);
+    params.append("q", query);
+    
+    if (video_type) params.append("video_type", video_type);
+    if (category) params.append("category", category);
+    if (page) params.append("page", page.toString());
+    if (per_page) params.append("per_page", per_page.toString());
+    if (safesearch !== undefined) params.append("safesearch", safesearch ? "true" : "false");
+
+    try {
+      // 调用Pixabay API
+      const response = await fetch(`https://pixabay.com/api/videos/?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify(data, null, 2)
+        }]
+      };
+    } catch (error) {
+      console.error("搜索视频时出错:", error);
+      return {
+        content: [{
+          type: "text",
+          text: `搜索视频时出错: ${error instanceof Error ? error.message : String(error)}`
+        }]
+      };
+    }
   }
 );
 
