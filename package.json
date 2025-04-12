@@ -5,16 +5,16 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "bin": {
-    "mcp-pixabay-server": "build/server.js"
+    "mcp-pixabay-server": "build/index.js"
   },
   "scripts": {
-    "start": "node build/server.js",
-    "build": "rimraf build && tsc && chmod +x build/server.js",
+    "start": "node build/index.js",
+    "build": "rimraf build && tsc && chmod +x build/index.js",
     "watch": "tsc -w",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "inspector": "mcp-inspector debug -- node build/server.js"
+    "inspector": "mcp-inspector debug -- node build/index.js"
   },
   "keywords": [
     "mcp",
