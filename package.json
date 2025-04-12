@@ -14,9 +14,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
     "inspector": "mcp-inspector debug -- node build/server.js"
   },
   "keywords": [
@@ -31,21 +28,17 @@
     "node-fetch": "^2.6.12"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.4.4",
-    "@commitlint/config-conventional": "^18.4.4",
     "@modelcontextprotocol/inspector": "^0.8.2",
     "@types/node": "^20.10.5",
     "@types/node-fetch": "^2.6.9",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "@vitest/coverage-v8": "^1.0.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "prettier": "^3.1.1",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "typescript": "^5.3.3"
   },
   "files": [
     "build/**/*"

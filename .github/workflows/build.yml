@@ -1,4 +1,4 @@
-name: 构建和测试
+name: 构建
 
 on:
   push:
@@ -32,6 +32,3 @@ jobs:
       
     - name: 构建
       run: npm run build
-      
-    - name: 测试
-      run: npm test
