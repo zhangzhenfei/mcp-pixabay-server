@@ -1,0 +1,46 @@
+name: PR 质量检查
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # 获取完整历史记录用于检查提交信息
+        
+    - name: 使用 Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: 安装依赖
+      run: npm ci
+      
+    - name: 代码检查
+      run: |
+        npm i @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
+        npm run lint
+        
+    - name: 检查提交信息格式
+      uses: wagoid/commitlint-github-action@v5
+      
+    - name: 测试
+      run: npm test
+      
+    - name: 测试覆盖率检查
+      run: |
+        npm run test:coverage
+        COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+        echo "代码覆盖率：$COVERAGE%"
+        if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+          echo "Warning: 代码覆盖率低于 70%"
+          exit 1
+        fi
+      continue-on-error: true  # 现在允许低覆盖率，但在将来可以设为 false 

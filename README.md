@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@sadais/mcp-pixabay-server.svg)](https://www.npmjs.com/package/@sadais/mcp-pixabay-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/sadais-org/mcp-pixabay-server/workflows/构建和测试/badge.svg)](https://github.com/sadais-org/mcp-pixabay-server/actions)
 
 基于 [MCP (Model Context Protocol)](https://modelcontextprotocol.github.io/) 的 Pixabay API 接口服务器，让 AI 模型可以搜索和获取 Pixabay 平台的图片和视频资源。
 
@@ -46,9 +47,6 @@ export PIXABAY_API_KEY=your_api_key_here
 ```bash
 # 启动 MCP 服务器
 mcp-pixabay-server
-
-# 或者使用 SSE 服务器模式
-mcp-pixabay-server-sse
 ```
 
 ### 与 AI 模型集成
@@ -92,7 +90,7 @@ mcp-pixabay-server-sse
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/mcp-pixabay-server.git
+git clone https://github.com/sadais-org/mcp-pixabay-server.git
 cd mcp-pixabay-server
 
 # 安装依赖
@@ -105,14 +103,60 @@ npm run build
 npm run watch
 ```
 
+### 测试
+
+我们使用 Vitest 进行测试。运行以下命令执行测试：
+
+```bash
+# 运行所有测试
+npm test
+
+# 观察模式运行测试
+npm run test:watch
+
+# 生成测试覆盖率报告
+npm run test:coverage
+```
+
+### 代码质量
+
+我们使用 ESLint 和 Prettier 来保证代码质量：
+
+```bash
+# 运行代码检查
+npm run lint
+
+# 自动修复代码问题
+npm run lint:fix
+```
+
+### 提交规范
+
+我们使用 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/) 规范来格式化提交信息。提交信息应遵循以下格式：
+
+```
+type(scope): subject
+```
+
+类型必须是以下之一：
+- `feat`: 新功能
+- `fix`: Bug修复
+- `docs`: 文档更新
+- `style`: 代码风格变更（不影响功能）
+- `refactor`: 代码重构
+- `perf`: 性能改进
+- `test`: 测试相关
+- `build`: 构建系统或外部依赖项
+- `ci`: CI配置和脚本
+- `chore`: 其他修改
+- `revert`: 回滚提交
+
 ### 调试
 
 由于 MCP 服务器通过 stdio 进行通信，调试可能具有挑战性。推荐使用 [MCP Inspector](https://github.com/modelcontextprotocol/inspector)：
 
 ```bash
 npm run inspector
-# 或者 SSE 模式
-npm run inspector:sse
 ```
 
 Inspector 将提供一个 URL，让您可以在浏览器中访问调试工具。
@@ -141,13 +185,21 @@ Inspector 将提供一个 URL，让您可以在浏览器中访问调试工具。
 提交 PR 时，请遵循以下规范：
 
 1. 创建一个描述性的分支名，如 `feature/add-image-filters` 或 `fix/api-timeout`
-2. 确保代码通过所有测试
-3. PR 标题应简洁明了地描述更改内容
+2. 确保代码通过所有测试和代码检查
+3. PR 标题应简洁明了地描述更改内容，并遵循 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/) 规范
 4. PR 描述中包含：
    - 更改的详细说明
    - 关联的 Issue 编号（如有）
    - 测试方法（如适用）
 5. 代码风格保持一致
+
+### 质量检查
+
+每个 PR 必须满足以下质量要求：
+- 通过所有自动化测试
+- 通过所有代码检查（ESLint）
+- 测试覆盖率不降低（目标覆盖率≥70%）
+- 提交信息符合规范
 
 ### 开发流程
 

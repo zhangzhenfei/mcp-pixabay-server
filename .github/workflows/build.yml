@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -21,6 +21,27 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build
-    - run: npm test 
+    
+    - name: 安装依赖
+      run: npm ci
+      
+    - name: 代码检查
+      run: |
+        npm i @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
+        npm run lint
+      
+    - name: 构建
+      run: npm run build
+      
+    - name: 测试
+      run: npm test
+      
+    - name: 测试覆盖率
+      run: npm run test:coverage
+      
+    - name: 上传测试覆盖率报告
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report-${{ matrix.node-version }}
+        path: coverage/
+        retention-days: 5 
