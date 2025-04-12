@@ -4,6 +4,7 @@
   "description": "MCP Pixabay API server",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "type": "module",
   "bin": {
     "mcp-pixabay-server": "build/index.js"
   },
@@ -14,7 +15,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "inspector": "mcp-inspector debug -- node build/index.js"
+    "inspector": "mcp-inspector debug -- node build/index.js",
+    "release": "node scripts/release.js"
   },
   "keywords": [
     "mcp",
