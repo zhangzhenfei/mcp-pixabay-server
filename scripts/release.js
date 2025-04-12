@@ -9,20 +9,6 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-// 确保工作区干净
-function ensureCleanWorkingDirectory() {
-  try {
-    const status = execSync('git status --porcelain').toString().trim();
-    if (status) {
-      console.error('工作区不干净，请先提交或暂存更改');
-      process.exit(1);
-    }
-  } catch (error) {
-    console.error('检查工作区状态失败:', error.message);
-    process.exit(1);
-  }
-}
-
 // 确保在主分支
 function ensureMainBranch() {
   try {
@@ -60,7 +46,6 @@ function getCurrentVersion() {
 async function main() {
   try {
     ensureMainBranch();
-    ensureCleanWorkingDirectory();
 
     // 拉取最新代码
     console.log('拉取最新代码...');
