@@ -56,6 +56,20 @@ mcp-pixabay-server
 1. 启动 MCP 服务器
 2. 配置 AI 模型使用此 MCP 服务
 
+在使用 Claude Opus 的 Cursor 或 Anthropic Console 等环境中，您可以通过配置 mcp.json 文件来集成此服务：
+
+```json
+"pixabay": {
+  "command": "npx",
+  "args": ["-y", "@sadais/mcp-pixabay-server"],
+  "env": {
+    "PIXABAY_API_KEY": "your_api_key_here"
+  }
+}
+```
+
+将以上配置添加到您的 mcp.json 文件中，然后 AI 模型就能通过 MCP 协议调用 Pixabay 搜索功能。
+
 ### API 参考
 
 #### search_images
