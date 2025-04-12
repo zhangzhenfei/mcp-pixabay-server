@@ -104,14 +104,14 @@ async function main() {
     const newVersion = getCurrentVersion();
     console.log(`新版本: ${newVersion}`);
 
-    // 提交版本更新
-    console.log('\n提交版本更新...');
-    execCommand('git add package.json');
-    execCommand(`git commit -m "chore(release): 升级版本至 v${newVersion}"`);
-
     // 构建项目
     console.log('\n构建项目...');
     execCommand('npm run build');
+
+    // 提交版本更新
+    console.log('\n提交版本更新...');
+    execCommand('git add .');
+    execCommand(`git commit -m "chore(release): 升级版本至 v${newVersion}"`);
 
     // 创建 Tag
     console.log('\n创建 Tag...');
