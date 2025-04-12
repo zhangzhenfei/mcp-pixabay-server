@@ -33,7 +33,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18.4.4",
     "@commitlint/config-conventional": "^18.4.4",
-    "@modelcontextprotocol/inspector": "^0.1.21",
+    "@modelcontextprotocol/inspector": "^0.8.2",
     "@types/node": "^20.10.5",
     "@types/node-fetch": "^2.6.9",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
