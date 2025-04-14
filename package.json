@@ -1,6 +1,6 @@
 {
   "name": "@sadais/mcp-pixabay-server",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "MCP Pixabay API server",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -50,10 +50,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sadais-org/mcp-pixabay-server.git"
+    "url": "git+https://github.com/zhangzhenfei/mcp-pixabay-server"
   },
   "bugs": {
-    "url": "https://github.com/sadais-org/mcp-pixabay-server/issues"
+    "url": "https://github.com/zhangzhenfei/mcp-pixabay-server/issues"
   },
-  "homepage": "https://github.com/sadais-org/mcp-pixabay-server#readme"
+  "homepage": "https://github.com/zhangzhenfei/mcp-pixabay-server#readme"
 }
